@@ -9,9 +9,9 @@ var sz_Y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
 function setup() {
     
-    var canvas = createCanvas(sz_X, sz_Y);
+    var canvas = createCanvas(sz_X, sz_Y, WEBGL);
     canvas.parent('graphics');
-    background("rgba(17,0,55,1)");
+    background(0);
 
     colorMode(HSB, 100);
     rectMode(CENTER);
@@ -20,5 +20,7 @@ function setup() {
 }
 
 function draw() {
+
+    
 
 }
