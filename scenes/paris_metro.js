@@ -1,4 +1,4 @@
-// Setting up Window
+// Setting up canvas with window size
 var w = window,
         d = document,
         e = d.documentElement,
@@ -7,12 +7,8 @@ var w = window,
 var sz_X = w.innerWidth || e.clientWidth || g.clientWidth;
 var sz_Y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-var particles = []
-var num_particles = 50
-var linec = 0
-
+// To handle zoom and pan
 var val_wheel = 1
-
 var delta = {
     x: 0,
     y: 0
@@ -21,9 +17,9 @@ var anchor = {
     x: 0,
     y: 0
 }
-
 var val_scaler = 1
 
+// Enable/disable network
 var bool_drawRER = false
 var bool_drawMETRO = true
 
@@ -43,24 +39,20 @@ function draw() {
 
     background(0);
 
+    // View parameters to convert from lat-long into normalized, centered coordinates
     var view_params = {
         "scale": 0.9 * sz_Y * val_scaler,// + val_wheel * 100,
         "panx": sz_X / 2.0 + delta.x,
         "pany": sz_Y / 2.0 + delta.y,
-        "offset_x": 2.228536982,
+        "offset_x": 2.350800,
         "normalise_x": 0.236028012,
-        "offset_y": 48.76871513,
+        "offset_y": 48.856700,
         "normalise_y": 0.177130532
-        // "offset_x": 1.995901988,
-        // "normalise_x": 0.786324736,
-        // "offset_y": 48.29359177,
-        // "normalise_y": 0.970352376
     }
 
     if (bool_drawRER) {
-        view_params.offset_x = 1.995901988
+        // Change some view parameters to zoom out for RER network
         view_params.normalise_x = 0.786324736
-        view_params.offset_y = 48.29359177
         view_params.normalise_y = 0.970352376
 
         var rer_draw_params = {
@@ -94,6 +86,7 @@ function draw() {
 
 }
 
+// Handle zooming
 function mouseWheel(event) {
     val_scaler = val_scaler * (1 + event.delta/10)
     
@@ -104,11 +97,11 @@ function mouseWheel(event) {
     }
 }
 
+// Handle panning
 function mousePressed() {
     anchor.x = mouseX
     anchor.y = mouseY
 }
-
 function mouseDragged() {
     delta.x += mouseX - anchor.x
     delta.y += mouseY - anchor.y
@@ -116,18 +109,6 @@ function mouseDragged() {
     anchor.y = mouseY
 
 }
-
-// function mouseReleased() {
-//     console.log("> Released")
-//     delta.x += mouseX - anchor.x
-//     delta.y += mouseY - anchor.y
-
-//     anchor.x = mouseX
-//     anchor.y = mouseY
-//     console.log(anchor.x)
-//     console.log(anchor.y)
-//     console.log("< Released")
-// }
 
 function drawFromStaticData(static_data, view_params, draw_params) {
 
@@ -139,21 +120,24 @@ function drawFromStaticData(static_data, view_params, draw_params) {
     var val_offset_y = view_params.offset_y
     var val_normalise_y = view_params.normalise_y
 
+    // Normalizing both x and y with the same value to maintain aspect ratio
+    var val_normalise = Math.min(val_normalise_x, val_normalise_y)
+
     for (i_line=0; i_line < static_data.lines.length; i_line++) {
         fill(static_data.lines[i_line].color);
         noStroke();
 
         for (i_station=0; i_station < static_data.lines[i_line].stations.length; i_station++) {
             draw_params.shape(
-                ((static_data.lines[i_line].stations[i_station].pos_x - val_offset_x) / val_normalise_x - 0.5) * val_scale + val_panx, 
-                (0.5 - (static_data.lines[i_line].stations[i_station].pos_y - val_offset_y) / val_normalise_y) * val_scale + val_pany, 
+                ((static_data.lines[i_line].stations[i_station].pos_x - val_offset_x) / val_normalise) * val_scale + val_panx, 
+                ( - (static_data.lines[i_line].stations[i_station].pos_y - val_offset_y) / val_normalise) * val_scale + val_pany, 
                 draw_params.size,
                 draw_params.size
                 );
             if (draw_params.withlabels) {
                 text(static_data.lines[i_line].stations[i_station].name, 
-                    ((static_data.lines[i_line].stations[i_station].pos_x - val_offset_x) / val_normalise_x - 0.5) * val_scale + val_panx + draw_params.labeloffset.x, 
-                    (0.5 - (static_data.lines[i_line].stations[i_station].pos_y - val_offset_y) / val_normalise_y) * val_scale + val_pany + draw_params.labeloffset.y
+                    ((static_data.lines[i_line].stations[i_station].pos_x - val_offset_x) / val_normalise) * val_scale + val_panx + draw_params.labeloffset.x, 
+                    ( - (static_data.lines[i_line].stations[i_station].pos_y - val_offset_y) / val_normalise) * val_scale + val_pany + draw_params.labeloffset.y
                     )
             }
         }
