@@ -16,21 +16,22 @@ var seed = d.getTime();
 
 // Seeting up smoke
 var smoke = [];
-var nr_smoke = Math.max(sz_X, sz_Y) * 1.3;
+var nr_smoke = Math.max(sz_X, sz_Y) * 2;
 if (debug) {
     nr_smoke = 100;
 }
 
 // Speed parameters
-var val_coordweight = 250;
-var val_moveslowdown = 500;
+var val_coordweight = 350;
+var val_moveslowdown = 2300;
 
 
 function setup() {
     
     var canvas = createCanvas(sz_X, sz_Y);
     canvas.parent('graphics');
-    background("rgba(17,0,55,1)");
+    // background("rgba(17,0,55,1)");
+    background("black");
     
     colorMode(HSB, 100);
     rectMode(CENTER);
@@ -49,7 +50,8 @@ function setup() {
 
 function draw() {
 
-    background("rgba(17,0,55,0.002)");
+    // background("rgba(17,0,55,0.002)");
+    // background("rgba(0,0,0,0.002)");
 
     noFill();
 
@@ -77,14 +79,14 @@ function draw() {
     if (debug) {
         stroke("rgba(255, 255, 255, 1)")
     } else {
-        stroke("rgba(255, 255, 255, 0.01)")
+        stroke("rgba(255, 255, 255, 0.005)")
     }
 
     for (i = 0; i < nr_smoke; i++) {
         ellipse(smoke[i].x, smoke[i].y, 1, 1);
         var angle = noise(smoke[i].x/val_coordweight, smoke[i].y/val_coordweight, frameCount/val_moveslowdown) * 3 * PI;
-        smoke[i].x += Math.cos(angle) * 3;
-        smoke[i].y += Math.sin(angle) * 3;
+        smoke[i].x += Math.cos(angle) * 1.5;
+        smoke[i].y += Math.sin(angle) * 1.5;
         
         if (smoke[i].x > sz_X | smoke[i].x < 0 | smoke[i].y > sz_Y | smoke[i].y < 0) {
             smoke[i].x = Math.random() * (sz_X + 1);
